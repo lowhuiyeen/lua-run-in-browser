@@ -235,47 +235,144 @@
             color: #667eea;
         }
 
+        /* Footer Styles */
+        .footer-wrapper {
+            max-width: 1400px;
+            margin: 40px auto 0;
+            padding: 0 20px 20px;
+        }
+
         .footer-grid {
-            margin-top: 40px;
-            padding: 30px 20px;
-            background: #f8fafc;
-            border-radius: 12px;
+            background: white;
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
         }
 
         .footer-grid h4 {
-            margin: 0 0 8px 0;
-            color: #2c3e50;
+            margin: 0 0 30px 0;
+            color: #2d3561;
+            font-size: 1.8em;
+            text-align: center;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .social {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
         .social a {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            color: #2563eb;
+            justify-content: center;
+            gap: 15px;
+            padding: 30px 20px;
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid #e1e8ed;
+            border-radius: 20px;
+            color: #2d3561;
             text-decoration: none;
-            transition: color 0.3s;
+            font-weight: 600;
+            font-size: 1.05em;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+        .social a:hover::before {
+            opacity: 1;
         }
 
         .social a:hover {
-            color: #1d4ed8;
+            transform: translateY(-8px) scale(1.03);
+            border-color: transparent;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .icon-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .social a:hover .icon-wrapper {
+            background: white;
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
         }
 
         .icon {
-            width: 20px;
-            height: 20px;
+            width: 32px;
+            height: 32px;
+            filter: brightness(0) invert(1);
+            transition: filter 0.4s ease;
         }
 
-        .small {
-            padding: 20px;
-            text-align: center;
-            font-size: 0.9em;
-            color: #64748b;
+        .social a:hover .icon {
+            filter: brightness(0) saturate(100%) invert(33%) sepia(93%) saturate(1234%) hue-rotate(228deg) brightness(96%) contrast(90%);
+        }
+
+        .social a span {
+            position: relative;
+            z-index: 1;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .footer-copyright {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 25px 40px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            color: white;
+            font-size: 0.95em;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .footer-copyright span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.95;
         }
 
         @media (max-width: 768px) {
@@ -295,6 +392,24 @@
 
             .header-text {
                 text-align: center;
+            }
+
+            .social {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                padding: 30px 20px;
+            }
+
+            .footer-grid h4 {
+                font-size: 1.5em;
+            }
+
+            .footer-copyright {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
             }
         }
     </style>
@@ -528,33 +643,48 @@
         initializeLua();
     </script>
 
-<div class="footer-grid container">
-  <div>
-    <h4 style="margin:0 0 8px 0;color:#2c3e50">Connect</h4>
-    <div class="social">
-      <a href="mailto:lowhuiyeen@gmail.com">
-        <img src="assets/icons/mail.svg" alt="Email" class="icon"> Email
-      </a>
-      <a href="https://www.linkedin.com/in/huiyeenlow/" target="_blank">
-        <img src="assets/icons/linkedin.svg" alt="LinkedIn" class="icon"> LinkedIn
-      </a>
-      <a href="https://github.com/lowhuiyeen" target="_blank">
-        <img src="assets/icons/github.svg" alt="GitHub" class="icon"> GitHub
-      </a>
-      <a href="https://www.youtube.com/@huiyeen" target="_blank">
-        <img src="assets/icons/youtube.svg" alt="YouTube" class="icon"> YouTube
-      </a>
-      <a href="https://www.roblox.com/users/9456961059/profile" target="_blank">
-        <img src="assets/icons/roblox.svg" alt="Roblox" class="icon"> Roblox
-      </a>
+    <!-- Footer Section -->
+    <div class="footer-wrapper">
+        <div class="footer-grid">
+            <h4>✨ Let's Connect ✨</h4>
+            <div class="social">
+                <a href="mailto:lowhuiyeen@gmail.com">
+                    <div class="icon-wrapper">
+                        <img src="assets/icons/mail.svg" alt="Email" class="icon">
+                    </div>
+                    <span>Email</span>
+                </a>
+                <a href="https://www.linkedin.com/in/huiyeenlow/" target="_blank">
+                    <div class="icon-wrapper">
+                        <img src="assets/icons/linkedin.svg" alt="LinkedIn" class="icon">
+                    </div>
+                    <span>LinkedIn</span>
+                </a>
+                <a href="https://github.com/lowhuiyeen" target="_blank">
+                    <div class="icon-wrapper">
+                        <img src="assets/icons/github.svg" alt="GitHub" class="icon">
+                    </div>
+                    <span>GitHub</span>
+                </a>
+                <a href="https://www.youtube.com/@huiyeen" target="_blank">
+                    <div class="icon-wrapper">
+                        <img src="assets/icons/youtube.svg" alt="YouTube" class="icon">
+                    </div>
+                    <span>YouTube</span>
+                </a>
+                <a href="https://www.roblox.com/users/9456961059/profile" target="_blank">
+                    <div class="icon-wrapper">
+                        <img src="assets/icons/roblox.svg" alt="Roblox" class="icon">
+                    </div>
+                    <span>Roblox</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-copyright">
+            <span>© 2025 • All rights reserved.</span>
+            <span>✨ Built with passion & vanilla HTML/CSS/JS</span>
+        </div>
     </div>
-  </div>
-</div>
-
-<div class="container small" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
-  <span>© 2025 • All rights reserved.</span>
-  <span>Built with vanilla HTML/CSS/JS • Fully reusable & dynamic</span>
-</div>
-
 </body>
 </html>
