@@ -1,118 +1,352 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Lua in the Browser (Fengari)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-    h1 { margin-bottom: .25rem; }
-    .row { display: grid; gap: 1rem; grid-template-columns: 1fr; }
-    @media (min-width: 900px){ .row { grid-template-columns: 1fr 1fr; } }
-    textarea { width: 100%; min-height: 320px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; }
-    pre { background:#f6f8fa; padding: 1rem; min-height: 320px; overflow:auto; }
-    button { padding:.6rem 1rem; border-radius: 10px; border: 1px solid #d0d7de; cursor: pointer; }
-    .bar { display:flex; gap:.5rem; align-items:center; margin:.75rem 0; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua Beginner to Roblox - Interactive Lessons</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lua-wasm/0.0.1/lua.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2d3561 0%, #1a1f3a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            background: #f5f7fa;
+            border-right: 2px solid #e1e8ed;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .lesson-list {
+            list-style: none;
+        }
+
+        .lesson-item {
+            margin-bottom: 10px;
+        }
+
+        .lesson-button {
+            width: 100%;
+            padding: 12px 15px;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            color: #2d3561;
+            font-weight: 500;
+        }
+
+        .lesson-button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .lesson-button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .run-button {
+            padding: 12px 30px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .run-button:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+
+        .clear-button {
+            padding: 12px 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clear-button:hover {
+            background: #dc2626;
+        }
+
+        .lesson-title {
+            flex: 1;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2d3561;
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 350px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            resize: vertical;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        .output-section {
+            margin-top: 20px;
+        }
+
+        .output-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d3561;
+            font-size: 1.1em;
+        }
+
+        .output {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            background: #1e293b;
+            color: #10b981;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            border: 2px solid #334155;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 2px solid #e1e8ed;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Lua in the Browser</h1>
-  <p>Type Lua on the left → click <b>Run</b>. Output appears on the right. (Powered by <a href="https://fengari.io" target="_blank">Fengari</a>)</p>
+    <div class="container">
+        <header>
+            <h1>🌙 Lua Beginner to Roblox</h1>
+            <p class="subtitle">Interactive Lua Learning Platform</p>
+        </header>
 
-  <div class="bar">
-    <button id="run">Run ▶</button>
-    <button id="clear">Clear Output</button>
-  </div>
+        <div class="main-content">
+            <aside class="sidebar">
+                <h3 style="margin-bottom: 15px; color: #2d3561;">📚 Lessons</h3>
+                <ul class="lesson-list" id="lessonList"></ul>
+            </aside>
 
-  <div class="row">
-    <textarea id="code">
--- Try any Lua here!
-print("Hello from Lua!")
+            <div class="editor-section">
+                <div class="controls">
+                    <span class="lesson-title" id="currentLesson">Select a lesson to begin</span>
+                    <button class="clear-button" onclick="clearOutput()">Clear Output</button>
+                    <button class="run-button" onclick="runCode()">▶ Run Code</button>
+                </div>
 
--- Tables:
-local players = {
-  {name="Alice", score=150},
-  {name="Bob", score=120},
-  {name="Charlie", score=180}
-}
+                <textarea class="code-editor" id="codeEditor" placeholder="Select a lesson from the sidebar to start learning Lua..."></textarea>
 
-for i, p in ipairs(players) do
-  print(i, p.name, p.score)
-end
+                <div class="output-section">
+                    <div class="output-label">📤 Output:</div>
+                    <div class="output" id="output">Output will appear here...</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
--- Use the browser DOM via Fengari's js binding:
-local js = require "js"
-local document = js.global.document
-document:getElementById("dom-status").textContent = "Lua touched the DOM ✅"
-    </textarea>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fengari-web/0.1.4/fengari-web.js"></script>
+    <script>
+        const lessons = [
+            { file: 'lesson1_syntax_execution.lua', name: 'Lesson 1: Syntax & Execution' },
+            { file: 'lesson2_variable_dataType.lua', name: 'Lesson 2: Variables & Data Types' },
+            { file: 'lesson3_operators.lua', name: 'Lesson 3: Operators' },
+            { file: 'lesson4_controlFlow.lua', name: 'Lesson 4: Control Flow' },
+            { file: 'lesson5_functions.lua', name: 'Lesson 5: Functions' },
+            { file: 'lesson6_tables.lua', name: 'Lesson 6: Tables' },
+            { file: 'lesson7_scope_localVariable.lua', name: 'Lesson 7: Scope & Local Variables' },
+            { file: 'lesson8a_modules_files.lua', name: 'Lesson 8a: Modules & Files' },
+            { file: 'lesson8b_mathlib.lua', name: 'Lesson 8b: Math Library' },
+            { file: 'lesson9_string_tableLibraryFunction.lua', name: 'Lesson 9: String & Table Functions' },
+            { file: 'lesson10_errorHandling.lua', name: 'Lesson 10: Error Handling' }
+        ];
 
-    <pre id="out" aria-live="polite"></pre>
-  </div>
+        let currentCode = '';
 
-  <p id="dom-status" style="margin-top:1rem;color:#0969da;"></p>
+        function initializeLessons() {
+            const lessonList = document.getElementById('lessonList');
+            lessons.forEach((lesson, index) => {
+                const li = document.createElement('li');
+                li.className = 'lesson-item';
+                const button = document.createElement('button');
+                button.className = 'lesson-button';
+                button.textContent = lesson.name;
+                button.onclick = () => loadLesson(lesson, index);
+                li.appendChild(button);
+                lessonList.appendChild(li);
+            });
+        }
 
-  <!-- Fengari (Lua 5.3 VM in JS) -->
-  <script src="https://unpkg.com/fengari-web/dist/fengari-web.js"></script>
-  <script>
-    // Pull out Fengari APIs
-    const { lua, lauxlib, lualib, to_luastring } = fengari;
+        async function loadLesson(lesson, index) {
+            try {
+                const response = await fetch(`lesson-files/${lesson.file}`);
+                if (!response.ok) throw new Error('Lesson file not found');
+                
+                const code = await response.text();
+                document.getElementById('codeEditor').value = code;
+                document.getElementById('currentLesson').textContent = lesson.name;
+                currentCode = code;
 
-    // Create a Lua state and open libraries once
-    const L = lauxlib.luaL_newstate();
-    lualib.luaL_openlibs(L);
+                document.querySelectorAll('.lesson-button').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === index);
+                });
 
-    // Helper to append to output panel
-    function writeOut(line) {
-      const out = document.getElementById('out');
-      out.textContent += line + "\n";
-      out.scrollTop = out.scrollHeight;
-    }
+                clearOutput();
+            } catch (error) {
+                document.getElementById('output').innerHTML = 
+                    `<span class="error">Error loading lesson: ${error.message}\n\nMake sure the lesson files are in the 'lesson-files' folder.</span>`;
+            }
+        }
 
-    // Install a custom 'print' that writes to the page
-    (function installPrint(){
-      const bootstrap = `
-        local js = require "js"
-        local document = js.global.document
-        local function page_print(...)
-          local out = {}
-          for i = 1, select("#", ...) do
-            out[#out+1] = tostring(select(i, ...))
-          end
-          local s = table.concat(out, "\\t")
-          js.global:writeOut(s) -- call JS function exposed below
-        end
-        print = page_print
-      `;
-      // Expose writeOut to Lua via js.global
-      window.writeOut = writeOut;
-      lauxlib.luaL_dostring(L, to_luastring(bootstrap));
-    })();
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const outputDiv = document.getElementById('output');
+            let output = '';
 
-    function runLua(src) {
-      // Clear previous Lua error (if any)
-      const status = lauxlib.luaL_loadbuffer(L, to_luastring(src), null, to_luastring("userchunk"));
-      if (status !== lua.LUA_OK) {
-        const msg = lua.lua_tojsstring(L, -1);
-        writeOut("Load error: " + msg);
-        lua.lua_pop(L, 1);
-        return;
-      }
-      const callStatus = lua.lua_pcall(L, 0, lua.LUA_MULTRET, 0);
-      if (callStatus !== lua.LUA_OK) {
-        const msg = lua.lua_tojsstring(L, -1);
-        writeOut("Runtime error: " + msg);
-        lua.lua_pop(L, 1);
-      }
-    }
+            try {
+                const printCapture = [];
+                const oldPrint = typeof fengari !== 'undefined' ? fengari.L.print : null;
+                
+                if (typeof fengari !== 'undefined') {
+                    const L = fengari.lauxlib.luaL_newstate();
+                    fengari.lualib.luaL_openlibs(L);
+                    
+                    fengari.lua.lua_getglobal(L, fengari.to_luastring("print"));
+                    const printRef = fengari.lua.lua_topointer(L, -1);
+                    fengari.lua.lua_pop(L, 1);
+                    
+                    const customPrint = function(L) {
+                        let nargs = fengari.lua.lua_gettop(L);
+                        let result = [];
+                        for (let i = 1; i <= nargs; i++) {
+                            if (fengari.lua.lua_isstring(L, i)) {
+                                result.push(fengari.lua.lua_tojsstring(L, i));
+                            } else if (fengari.lua.lua_isnumber(L, i)) {
+                                result.push(fengari.lua.lua_tonumber(L, i));
+                            } else if (fengari.lua.lua_isboolean(L, i)) {
+                                result.push(fengari.lua.lua_toboolean(L, i));
+                            } else if (fengari.lua.lua_isnil(L, i)) {
+                                result.push('nil');
+                            } else {
+                                result.push(fengari.lua.lua_typename(L, fengari.lua.lua_type(L, i)));
+                            }
+                        }
+                        printCapture.push(result.join('\t'));
+                        return 0;
+                    };
+                    
+                    fengari.lua.lua_pushcfunction(L, customPrint);
+                    fengari.lua.lua_setglobal(L, fengari.to_luastring("print"));
+                    
+                    const result = fengari.lauxlib.luaL_dostring(L, fengari.to_luastring(code));
+                    
+                    if (result === fengari.lua.LUA_OK) {
+                        output = printCapture.join('\n') || 'Code executed successfully (no output)';
+                    } else {
+                        const errorMsg = fengari.lua.lua_tojsstring(L, -1);
+                        output = `<span class="error">Error: ${errorMsg}</span>`;
+                    }
+                    
+                    fengari.lua.lua_close(L);
+                } else {
+                    output = '<span class="error">Lua interpreter not loaded. Please refresh the page.</span>';
+                }
+            } catch (error) {
+                output = `<span class="error">Error: ${error.message}</span>`;
+            }
 
-    document.getElementById('run').addEventListener('click', () => {
-      const src = document.getElementById('code').value;
-      runLua(src);
-    });
+            outputDiv.innerHTML = output;
+        }
 
-    document.getElementById('clear').addEventListener('click', () => {
-      document.getElementById('out').textContent = "";
-    });
-  </script>
+        function clearOutput() {
+            document.getElementById('output').textContent = 'Output will appear here...';
+        }
+
+        initializeLessons();
+    </script>
 </body>
 </html>
