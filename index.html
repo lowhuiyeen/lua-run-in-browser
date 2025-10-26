@@ -48,6 +48,23 @@
             color: white;
             padding: 30px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .header-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: contain;
+            background: white;
+            padding: 10px;
+        }
+
+        .header-text {
+            text-align: left;
         }
 
         h1 {
@@ -218,6 +235,49 @@
             color: #667eea;
         }
 
+        .footer-grid {
+            margin-top: 40px;
+            padding: 30px 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .footer-grid h4 {
+            margin: 0 0 8px 0;
+            color: #2c3e50;
+        }
+
+        .social {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .social a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2563eb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .social a:hover {
+            color: #1d4ed8;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .small {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #64748b;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -227,14 +287,26 @@
                 border-right: none;
                 border-bottom: 2px solid #e1e8ed;
             }
+
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-text {
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🌙 Lua Beginner to Roblox</h1>
-            <p class="subtitle">Interactive Lua Learning Platform</p>
+            <img src="lua-run-in-browser.png" alt="Lua Logo" class="header-logo">
+            <div class="header-text">
+                <h1>Lua Beginner to Roblox</h1>
+                <p class="subtitle">Interactive Lua Learning Platform</p>
+            </div>
         </header>
 
         <div class="main-content">
@@ -455,5 +527,34 @@
         initializeLessons();
         initializeLua();
     </script>
+
+<div class="footer-grid container">
+  <div>
+    <h4 style="margin:0 0 8px 0;color:#2c3e50">Connect</h4>
+    <div class="social">
+      <a href="mailto:lowhuiyeen@gmail.com">
+        <img src="assets/icons/mail.svg" alt="Email" class="icon"> Email
+      </a>
+      <a href="https://www.linkedin.com/in/huiyeenlow/" target="_blank">
+        <img src="assets/icons/linkedin.svg" alt="LinkedIn" class="icon"> LinkedIn
+      </a>
+      <a href="https://github.com/lowhuiyeen" target="_blank">
+        <img src="assets/icons/github.svg" alt="GitHub" class="icon"> GitHub
+      </a>
+      <a href="https://www.youtube.com/@huiyeen" target="_blank">
+        <img src="assets/icons/youtube.svg" alt="YouTube" class="icon"> YouTube
+      </a>
+      <a href="https://www.roblox.com/users/9456961059/profile" target="_blank">
+        <img src="assets/icons/roblox.svg" alt="Roblox" class="icon"> Roblox
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container small" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+  <span>© 2025 • All rights reserved.</span>
+  <span>Built with vanilla HTML/CSS/JS • Fully reusable & dynamic</span>
+</div>
+
 </body>
 </html>
