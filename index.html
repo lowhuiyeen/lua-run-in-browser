@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Lua in the Browser (Fengari)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { margin-bottom: .25rem; }
+    .row { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+    @media (min-width: 900px){ .row { grid-template-columns: 1fr 1fr; } }
+    textarea { width: 100%; min-height: 320px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; }
+    pre { background:#f6f8fa; padding: 1rem; min-height: 320px; overflow:auto; }
+    button { padding:.6rem 1rem; border-radius: 10px; border: 1px solid #d0d7de; cursor: pointer; }
+    .bar { display:flex; gap:.5rem; align-items:center; margin:.75rem 0; }
+  </style>
+</head>
+<body>
+  <h1>Lua in the Browser</h1>
+  <p>Type Lua on the left → click <b>Run</b>. Output appears on the right. (Powered by <a href="https://fengari.io" target="_blank">Fengari</a>)</p>
+
+  <div class="bar">
+    <button id="run">Run ▶</button>
+    <button id="clear">Clear Output</button>
+  </div>
+
+  <div class="row">
+    <textarea id="code">
+-- Try any Lua here!
+print("Hello from Lua!")
+
+-- Tables:
+local players = {
+  {name="Alice", score=150},
+  {name="Bob", score=120},
+  {name="Charlie", score=180}
+}
+
+for i, p in ipairs(players) do
+  print(i, p.name, p.score)
+end
+
+-- Use the browser DOM via Fengari's js binding:
+local js = require "js"
+local document = js.global.document
+document:getElementById("dom-status").textContent = "Lua touched the DOM ✅"
+    </textarea>
+
+    <pre id="out" aria-live="polite"></pre>
+  </div>
+
+  <p id="dom-status" style="margin-top:1rem;color:#0969da;"></p>
+
+  <!-- Fengari (Lua 5.3 VM in JS) -->
+  <script src="https://unpkg.com/fengari-web/dist/fengari-web.js"></script>
+  <script>
+    // Pull out Fengari APIs
+    const { lua, lauxlib, lualib, to_luastring } = fengari;
+
+    // Create a Lua state and open libraries once
+    const L = lauxlib.luaL_newstate();
+    lualib.luaL_openlibs(L);
+
+    // Helper to append to output panel
+    function writeOut(line) {
+      const out = document.getElementById('out');
+      out.textContent += line + "\n";
+      out.scrollTop = out.scrollHeight;
+    }
+
+    // Install a custom 'print' that writes to the page
+    (function installPrint(){
+      const bootstrap = `
+        local js = require "js"
+        local document = js.global.document
+        local function page_print(...)
+          local out = {}
+          for i = 1, select("#", ...) do
+            out[#out+1] = tostring(select(i, ...))
+          end
+          local s = table.concat(out, "\\t")
+          js.global:writeOut(s) -- call JS function exposed below
+        end
+        print = page_print
+      `;
+      // Expose writeOut to Lua via js.global
+      window.writeOut = writeOut;
+      lauxlib.luaL_dostring(L, to_luastring(bootstrap));
+    })();
+
+    function runLua(src) {
+      // Clear previous Lua error (if any)
+      const status = lauxlib.luaL_loadbuffer(L, to_luastring(src), null, to_luastring("userchunk"));
+      if (status !== lua.LUA_OK) {
+        const msg = lua.lua_tojsstring(L, -1);
+        writeOut("Load error: " + msg);
+        lua.lua_pop(L, 1);
+        return;
+      }
+      const callStatus = lua.lua_pcall(L, 0, lua.LUA_MULTRET, 0);
+      if (callStatus !== lua.LUA_OK) {
+        const msg = lua.lua_tojsstring(L, -1);
+        writeOut("Runtime error: " + msg);
+        lua.lua_pop(L, 1);
+      }
+    }
+
+    document.getElementById('run').addEventListener('click', () => {
+      const src = document.getElementById('code').value;
+      runLua(src);
+    });
+
+    document.getElementById('clear').addEventListener('click', () => {
+      document.getElementById('out').textContent = "";
+    });
+  </script>
+</body>
+</html>
