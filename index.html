@@ -240,6 +240,15 @@
                     <div class="output-label">📤 Output:</div>
                     <div class="output" id="output">Loading Lua interpreter...</div>
                 </div>
+                
+                <div style="margin-top: 15px; padding: 12px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px; font-size: 0.9em;">
+                    <strong>⚠️ Browser Limitations:</strong>
+                    <ul style="margin: 8px 0 0 20px; line-height: 1.6;">
+                        <li><code>require()</code> doesn't work - modules must be in the same file</li>
+                        <li>File operations (<code>io.read</code>, <code>io.open</code>) are not available</li>
+                        <li>Some lessons may need modification to run in browser</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -379,6 +388,28 @@
                 
                 fengari.lua.lua_pushcfunction(L, customPrint);
                 fengari.lua.lua_setglobal(L, fengari.to_luastring("print"));
+                
+                const ioTable = {};
+                const ioWrite = function(L) {
+                    let nargs = fengari.lua.lua_gettop(L);
+                    let result = [];
+                    for (let i = 1; i <= nargs; i++) {
+                        if (fengari.lua.lua_isstring(L, i)) {
+                            result.push(fengari.lua.lua_tojsstring(L, i));
+                        } else if (fengari.lua.lua_isnumber(L, i)) {
+                            result.push(fengari.lua.lua_tonumber(L, i));
+                        } else {
+                            result.push(String(fengari.lua.lua_topointer(L, i)));
+                        }
+                    }
+                    printCapture.push(result.join(''));
+                    return 0;
+                };
+                
+                fengari.lua.lua_newtable(L);
+                fengari.lua.lua_pushcfunction(L, ioWrite);
+                fengari.lua.lua_setfield(L, -2, fengari.to_luastring("write"));
+                fengari.lua.lua_setglobal(L, fengari.to_luastring("io"));
                 
                 const result = fengari.lauxlib.luaL_dostring(L, fengari.to_luastring(code));
                 
